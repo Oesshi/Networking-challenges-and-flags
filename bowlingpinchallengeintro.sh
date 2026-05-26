@@ -6,6 +6,7 @@ score_mode="team"
 individual_points=75
 team_points=300
 
+total_pins=10
 if ["$score_mode" = "team" ]; then 
    total_points=$team_points
 else
@@ -18,7 +19,17 @@ final_flag="flag{$flag_hash}"
 hidden_file_name=".bowlingpinflag.txt"
 
 #increase/ decreae points 
+calculate_progress() {
+   local log_file=$1
+if [-f "$log_file"]; then 
+   Fallen=$(cat 'log_file' | wc -l | tr -d '[:space:]')
+   Percent=$(echo "scale=2; ($Fallen / total_pins) * 100" | bc)
+   echo "fallen: SFallen / total_pins($Percent%)"
+else
+    echo "Fallen: 0 / $total_pins($Percent%)"
+fi
+}
 
-
+if [$1 == "knock"]; then 
 
 #linux commands 
