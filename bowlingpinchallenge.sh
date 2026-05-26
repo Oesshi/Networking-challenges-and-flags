@@ -49,4 +49,4 @@ echo "Successfully updated challenge ${challenge_id} from ${current_value} to ${
 
 #Linux commands 
 #!/bin/bash
-compgen -c
+compgen -c | grep -E  '^(ls|cat|cd|ls -la| ls -l|)^'
