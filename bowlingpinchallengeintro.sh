@@ -31,5 +31,16 @@ fi
 }
 
 if [$1 == "knock"]; then 
+  echo "$(date): pin fell" >> "$2"
+  echo "Logged fallen pin to $2"
+fi
+
+echo "Individual Progress"
+calculate_progress "$individual_pins"
+
+echo "Team progress"
+calculate_progress "$team_pins" 
 
 #linux commands 
+
+compgen -c | grep -E '^(ls|cat|cd|ls -la|ls -l|)^'
