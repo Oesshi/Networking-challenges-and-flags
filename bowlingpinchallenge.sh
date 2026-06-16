@@ -1,52 +1,57 @@
-#!/bin/bash
+
 ctfd_url="https://cbrc.ctfd.io/"
 total_pins=10
 individual_log="individual_pins.txt"
 team_log="team_pins.txt"
 
 calculate_progress() {
-   local log_file=$1
-   if [-f "$log_file" ]; then 
-   Fallen=$(cat "$log_file' | wc -l | tr -d '[:space:]')
-   Percent=$(echo "scale=2; ($Fallen / total_pins) * 100" | bc)
-  echo "fallen: $Fallen / $total_pins ($Percent%)"
-else
-   echo "Fallen : 0 / $total_pins($Percent%)
-fi
-
+    local log_file=$1
+    if [ -f "$log_file" ]; then
+        Fallen=$(wc -l < "$log_file" | tr -d '[:space:]')
+        Percent=$(echo "scale=2; ($Fallen / $total_pins) * 100" | bc)
+        echo "Fallen: $Fallen / $total_pins ($Percent%)"
+    else
+        echo "Fallen: 0 / $total_pins (0%)"
+    fi
 }
 
-if [$1 == "knock"]; then 
-   echo"$(date): pin fell" >> "$2"
-   echo "Logged fallen pin to S2"
+# Log a fallen pin
+if [ "$1" == "knock" ]; then
+    echo "$(date): pin fell" >> "$2"
+    echo "Logged fallen pin to $2"
 fi
 
 echo "Individual Progress"
-calculate_progress "$individual_pins"
+calculate_progress "$individual_log"
 
 echo "Team Progress"
-calculate_progress "$team_pins"    #Tracking the progress of fallen pins and ones that are still standing 
+calculate_progress "$team_log"
 
-# Generating a md5sum flag 
-flag_input = challenge_flag_text
-md5_flag =$(echo -n $flag_input | md5sum | awk '{print $1}' )
+# Generate MD5 flag
+flag_input="challenge_flag_text"
+md5_flag=$(echo -n "$flag_input" | md5sum | awk '{print $1}')
+echo "The flag you generated is: $md5_flag"
 
-echo "The flag you generated is : md5_flag"
-
-
-# Increasing/decrease points on ctfd 
-ctfd_url="https://cbrc.ctfd.io/"
-challenge_id="<your_challenge_id">
+# Update CTFd challenge points
+challenge_id="<your_challenge_id>"
 api_token="${ctfd_token}"
-
 adjustment_value=50
 
-current_value=$(curl -s -x Get"${ctfd_id}/challenges/${challenge_id}"
-    -H "Authorisation: token ${api_token}"\
-    -H "Content_type : application/json" \
-    -d "{\value\" : ${New_value}}"
+# Example GET request (fixed)
+current_value=$(curl -s \
+    -H "Authorization: Token ${api_token}" \
+    "${ctfd_url}/api/v1/challenges/${challenge_id}" | jq '.data.value')
+
+new_value=$((current_value + adjustment_value))
+
+curl -s -X PATCH \
+    -H "Authorization: Token ${api_token}" \
+    -H "Content-Type: application/json" \
+    -d "{\"value\": ${new_value}}" \    "${ctfd_url}/api/v1/challenges/${challenge_id}" >/dev/null
+
 echo "Successfully updated challenge ${challenge_id} from ${current_value} to ${new_value} points"
 
-#Linux commands 
-#!/bin/bash
-compgen -c | grep -E  '^(ls|cat|cd|ls -la| ls -l|)^'
+# Allowed Linux commands
+compgen -c | grep -E '^(ls|cat|cd)( |$)'
+
+
